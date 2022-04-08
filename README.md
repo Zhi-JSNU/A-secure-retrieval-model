@@ -38,6 +38,9 @@ The update process of the index file is as follows.
 # Invoke CPABE toolkit
 The codes of CS, client and management server have been written. What you need to do now is to call the cpabe toolkit. The default address is the CPABE folder.
 
+# Usage
+When you try to use the system, first perform login through fm.php. There are some login data for testing in config.ini.PHP. If there is no root index file, you need to generate "root list file" first. This function is provided by makeRoot.PHP. The detailed function of retrieval is provided by searchFile.PHP and searchFile2.PHP, the two retrieval methods are quite different. keygen.PHP needs to first call the cpabe toolkit, and then save the MK and key pairs. The file upload function is performed through useruploadfile.php.
+
 
 
 
