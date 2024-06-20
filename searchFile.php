@@ -14,21 +14,33 @@ body,div,p {margin:0 auto; padding:0;}
 .rtFM {width:500px; height:30px; overflow:hidden; margin-top:20px;}
 .rtFM a {width:160px; height:28px; line-height:28px; text-align:center; display:inline-block; border:1px #ccc solid; background-color:#f8f8f8; text-decoration:none; float:right;}
 .rtFM a:hover {background-color:#fff;}
+.suggestion-item {
+    padding: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    width: 292px;
+    margin-left: 291px;
+    border: 1px solid #000;
+    line-height: 1
+}
+.suggestion-item:hover {
+    background-color: #add8e6; /* 修改为浅蓝色背景 */
+}
 </style>
 <script type="text/javascript" src="./js/jquery-1.8.3.min.js"></script>
 <script type="text/javascript">
-$(document).ready(function(){
-	$("select[name='dstFolder']").change(function(){
-		if($(this).val()=='0'){
-			$("input[name='folder']").show();
-			$("div[name='inFolder']").show();
-			$("input[name='folder']").focus();
-		}else{
-			$("input[name='folder']").hide();
-			$("div[name='inFolder']").hide();
-		}
-	});
-});
+    $(document).ready(function(){
+        $("select[name='dstFolder']").change(function(){
+            if($(this).val()=='0'){
+                $("input[name='folder']").show();
+                $("div[name='inFolder']").show();
+                $("input[name='folder']").focus();
+            } else {
+                $("input[name='folder']").hide();
+                $("div[name='inFolder']").hide();
+            }
+        });
+    });
 function keygen(){
 	document.upFile.action='?action=KeyGen';
 	document.upFile.submit();
@@ -51,11 +63,16 @@ if (empty($_SESSION["name"])) {
 	header("location:fm.php");
 	exit;
 }
-
+$suggestions=array();
 $username=strval($_SESSION["name"]);
+//echo $username;
 $attribute=strval($_SESSION['attribute']);
+//echo $attribute;
 $action=isset($_GET['action'])?strval($_GET['action']):'';
-$keyword=isset($_POST['keyword'])?trim($_POST['keyword']):'';
+
+//$keyword = isset($_GET['query']) ? $_GET['query'] : '';
+$keyword = isset($_POST['keyword']) ? $_POST['keyword'] : '';
+
 $dstFolder=isset($_POST['dstFolder'])?trim($_POST['dstFolder']):'';
 
 $folder=isset($_POST['folder'])?trim($_POST['folder']):'';
@@ -134,7 +151,7 @@ if(!empty($childrens) && $childrens!='err'){
 	}
 	?>
 		Input the keyword：<input type="text" name="keyword" value="<?=$keyword?>"><br />
-		Please choose the folder that will be searched:
+        Please choose the folder that will be searched:
 		<select name="dstFolder">
 			<option value="root"<?php	if($dstFolder=='root'){echo ' selected';} ?>>Root</option>
 			<?=$lstOptions?>
@@ -144,6 +161,7 @@ if(!empty($childrens) && $childrens!='err'){
 	</form>
 </div>
 <p class="rtFM"><a href="fm.php">click to return</a></p>
+
 <p>
 <?php
 ?>
@@ -209,7 +227,13 @@ if($action=='search'){
 	$files='';
 	for($i=0;$i<$lenDstArr;$i++){
 		$lstCpabeFile="$root/CPABE/$lstDir/$newDstCpabe[$i].lst.cpabe";
+//        var_dump($lstCpabeFile);
+		//echo $lstCpabeFile;
+		//echo $keyword;
 		$temStr=getFilesByAttrAndKeyword($lstCpabeFile,$attribute,$keyword);
+//        var_dump($temStr);
+		//if($temStr)echo $temStr;
+		//else echo "123455";
 		if($temStr && $temStr!='Not Found.'){
 			$files.=$temStr;
 		}

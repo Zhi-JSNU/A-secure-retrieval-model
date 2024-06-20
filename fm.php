@@ -116,7 +116,6 @@ function listAll(){
 	$rootLstCpabeFile="$root/CPABE/$lstDir/root.lst.cpabe";
 	//echo $rootLstFile;exit;
 
-
 	if(empty($attribute)){
 		echo 'please relogin.<a href="?action=logout">relogin</a>';
 		exit;
@@ -149,8 +148,8 @@ function listAll(){
 	}
 
 	$childrens=getChildrenByAttr($lstCpabeFile,$attribute);
-	$files=getFilesByAttr($lstCpabeFile,$attribute);
-	//var_dump($files);exit;
+	$files=getFilesByAttr($lstCpabeFile,$attribute,$dn,$dir);
+//	var_dump($files);
 	//var_dump($childrens);exit;
 	if($childrens=='err'){
 		echo '<div class="lstFile"><a href="?action=show&dir='.$dp.'">[ Return Parent Directory ]</a></div>';
@@ -201,7 +200,7 @@ function loginSystem($array){
 	mysql_select_db($mysql_database);
 	$query = mysql_query("SELECT * FROM info WHERE name ='".$username."' LIMIT 0,1");
 	if($query){
-		while($row = mysql_fetch_array($query)) {  
+		while($row = mysql_fetch_array($query)) {
 			$attribute=$row['attribute'];
 			$_SESSION["name"]=$username;
 			$_SESSION["attribute"]=$attribute;
@@ -210,7 +209,7 @@ function loginSystem($array){
 		echo 'The "'.$username.'" is not exist.Please login system again.<br /><a href="fm.php">return index</a>';
 	}
 	mysql_close();
-	
+
 	************validate finished.**************************/
 
 	$result=validateUserLogin($username,$password,$array);
@@ -270,6 +269,16 @@ function logoutSystem(){
 }
 
 function readCpabe(){
+    $queryString = http_build_query($_GET);
+    parse_str($queryString, $parsedParams);
+    if (isset($parsedParams['dn'])) {
+        //生成dn的参数值
+        $dnValue = $parsedParams['dn'];
+    }
+    if (isset($parsedParams['dir'])) {
+        //生成dn的参数值
+        $dirValue = $parsedParams['dir'];
+    }
 	$filename=isset($_GET['file'])?strval($_GET['file']):'';
 
 	if(empty($filename)){
@@ -281,10 +290,20 @@ function readCpabe(){
 		$attribute=isset($_SESSION["attribute"])?strval($_SESSION["attribute"]):'';
 		if(empty($attribute)){
 			echo 'Please relogin.';exit;
-		}else{
-			$content=readCpabeFile($filePath,$attribute);
+		}else if (empty($dnValue) || empty($dirValue)){
+//			$content=readCpabeFile($filePath,$attribute);
+            //Liu Yixin begin
+            $content=readCpabeFileAndAtt($filePath,$attribute);
+            //Liu Yixin end
 			echo $content;
-		}
+		}else{
+            $lstDir=$_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.'CPABE/lstFiles';
+            $lstCpabeFile=$lstDir.DIRECTORY_SEPARATOR.$dirValue.'.lst.cpabe' ;
+            //Liu Yixin begin
+            $content=readChildCpabeFileAndAtt($filePath,$lstCpabeFile,$attribute,$dnValue,$dirValue);
+            //Liu Yixin end
+            echo $content;
+        }
 	}
 }
 

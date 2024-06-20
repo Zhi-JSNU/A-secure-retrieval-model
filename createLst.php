@@ -56,8 +56,6 @@ $att=isset($_POST['att'])?trim($_POST['att']):'';
 $dstFolder=isset($_POST['dstFolder'])?trim($_POST['dstFolder']):'';
 $folder=isset($_POST['folder'])?trim($_POST['folder']):'';
 
-$att=isset($_POST['att'])?trim($_POST['att']):'';
-
 
 $checked='';
 /*
@@ -129,7 +127,7 @@ if($action=='save'){
 	$newLstPath="$root/CPABE/$lstDir/$newFloder.lst.cpabe";
 
 	$upErr=1;
-	
+//	echo $newLstPath;
 	/************/
 				$fileContent=readBigFile($rootLstCpabeFile);
 				if (!$fp = fopen($rootLstCpabeFile,'rb+')) {
@@ -139,7 +137,6 @@ if($action=='save'){
 				if(preg_match("/^([a-zA-Z0-9]+[a-zA-Z0-9 or]*)(\t)([a-zA-Z0-9]+)(\r\n)/i",$fileContent,$matches,PREG_OFFSET_CAPTURE)){
 					$preg="/(\d+)(\-){1}(\d+)(\t)([a-zA-Z0-9]+[a-zA-Z0-9 or]*)(\r\n)/i";
 					if(preg_match_all($preg,$fileContent,$blockArr,PREG_SET_ORDER)){
-						//var_dump($blockArr);exit;
 						$blockNums=count($blockArr);//BLOCK的数量
 					}else{
 						$blockNums=0;
@@ -153,7 +150,7 @@ if($action=='save'){
 							if(preg_match("/(\d+)(\-){1}(\d+)(\t)([a-zA-Z0-9]+[a-zA-Z0-9 or]*)(\r\n)/i",$outer[0][0],$attrHeader)){
 								$lenHeaderArr=count($blockArr);//更新header之前，匹配的header数量
 								if($attrHeader[5]==$blockArr[($lenHeaderArr-1)][5]){//如果匹配的header，是所有header中的最后一个，插入到DP下面
-									//echo 'ssss';exit;
+                                    //echo 'ssss';exit;
 									//$realname='XX33.DOC';
 									$sectionA=$attrHeader[1];//区间A
 									$sectionB=$attrHeader[3];//区间B
@@ -173,9 +170,9 @@ if($action=='save'){
 									$oldCipher=substr($afterHeader,0,$sectionA+2);//全部密文中，匹配header的相应密文的之前所有部分。+2，是因为要包含中间的空行
 									//echo $oldCipher;exit;
 									$cipherBlock=substr($afterHeader,$sectionA+2,$sectionB);//匹配header的相应密文的内容
-									//echo $cipherBlock;exit;
+//									echo $cipherBlock;
 									$plainBlock=decodeStrByLinux($cipherBlock,'uploadmanager');
-
+//                                    var_dump($plainBlock);
 									/*start 在要写入的BLOCK内查找DC部分*/
 									$dcPreg="/D[P|C]{1}(\t){1}(\S)*(\t){1}([0-9A-Za-z]){8}.lst.cpabe/i";
 									if(preg_match_all($dcPreg,$plainBlock,$BlockDcArr,PREG_SET_ORDER)){
@@ -193,7 +190,6 @@ if($action=='save'){
 											$lenLastDC=strlen($DCinBlockArr[0][($DCinBlockLen-1)][0]);
 											$strTmp=substr($plainBlock,0,($offsetLastDC+$lenLastDC));
 											$newPlainBlock.=$strTmp."DC\t$folder\t$newFloder.lst.cpabe\r\n".substr($plainBlock,($offsetLastDC+$lenLastDC));
-											//echo $newPlainBlock;exit;
 										}else{
 											echo 'parten err1.';exit;
 										}
@@ -202,7 +198,7 @@ if($action=='save'){
 											$strTmp=$BlockDpArr[0][0];
 											$lenBlockDP=strlen($BlockDpArr[0][0]);
 											$newPlainBlock.=$strTmp."DC\t$folder\t$newFloder.lst.cpabe\r\n".substr($plainBlock,$lenBlockDP);
-											//echo $newPlainBlock;exit;
+//											var_dump($newPlainBlock);
 										}else{
 											echo 'parten err2.';exit;
 										}
@@ -359,9 +355,11 @@ if($action=='save'){
 								createFile($rootLstCpabeFile,$newContent);
 					}
 				}else{//LST内容为空的时候，直接在文件尾部开始插入BLOCK
+                    echo "此时是添加的第一个文件夹";
 					$plaintext='';
 					$plaintext.="DP\t\t\r\n";
 					$plaintext.="DC\t$folder\t$newFloder.lst.cpabe\r\n";
+                    echo $plaintext;
 					$ciphertext=encodeStrByLinux($plaintext,$att.' or uploadmanager');
 					$cipherLen=strlen($ciphertext);
 					$blockPlain="0-$cipherLen\t$att\r\n";
@@ -371,7 +369,7 @@ if($action=='save'){
 				}
 
 
-			
+
 			$strHeader="minister or master or member or uploadmanager\tuploadmanager\r\n";
 			createFile($newLstPath,$strHeader);
 			$upErr=0;
